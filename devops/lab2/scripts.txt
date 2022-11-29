@@ -1,0 +1,23 @@
+ec2 create-vpc --cidr-block 10.0.0.0/16
+ec2 create-subnet --vpc-id vpc-000387947f563db41 --cidr-block 10.0.1.0/24
+ec2 create-tags --resources vpc-000387947f563db41 --tags Key=Net2,Value=Net2
+ec2 create-subnet --vpc-id vpc-000387947f563db41 --cidr-block 10.0.2.0/24
+ec2 create-tags --resources subnet-0772c857075faecb2 --tags Key=Net2,Value=Net2
+ec2 create-tags --resources subnet-0352a4458385a74e3 --tags Key=Net1,Value=Net1
+ec2 create-internet-gateway
+ec2 create-tags --resources igw-03c39377fa73cdd38 --tags Key=Net1,Value=Net1
+ec2 attach-internet-gateway --internet-gateway-id igw-03c39377fa73cdd38 --vpc-id vpc-000387947f563db41
+ec2 allocate-address --domain vpc
+ec2 create-nat-gateway --subnet-id subnet-0352a4458385a74e3 --allocation-id eipalloc-0c05c27814c47378a
+ec2 create-tags --resources nat-0bda2af3284145446 --tags Key=Net1,Value=Net1
+ec2 create-route-table --vpc-id vpc-000387947f563db41
+aws ec2 create-tags --resources rtb-0d76619f94dc2f295 --tags Key=Net1,Value=Net1
+ec2 create-route --route-table-id rtb-0d76619f94dc2f295 --destination-cidr-block 0.0.0.0/0 --gateway-id igw-03c39377fa73cdd38
+ec2 associate-route-table --route-table-id rtb-0d76619f94dc2f295 --subnet-id subnet-0352a4458385a74e3
+ec2 create-security-group --group-name Net1Group --description publicNet1 --vpc-id vpc-000387947f563db41
+ec2 authorize-security-group-ingress --group-id sg-0667932dc645854a2 --protocol tcp --port 22 --cidr 0.0.0.0/0
+ec2 create-key-pair --key-name cli-keyPair --query 'KeyMaterial' --output text > cli-keyPair.pem
+
+chmod 400 cli-keyPair.pem
+ ssh -i "cli-keyPair.pem" ec2-user@ec2-100-24-57-68.compute-1.amazonaws.com
+
