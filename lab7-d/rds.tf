@@ -6,7 +6,7 @@ resource "aws_db_instance" "Lab7" {
     instance_class = "db.t2.micro"
     db_name = "dbtest"
     username = "testuser"
-    password = "Lgfd!53Kjst34"
+    password = user.password
     storage_type = "gp2"
     allocated_storage = 20
     parameter_group_name = "default.mysql5.7"
